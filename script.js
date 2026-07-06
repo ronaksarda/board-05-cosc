@@ -11,44 +11,7 @@ const DEFAULT_COLUMNS = [
   { id: "done", title: "Done", color: "#10b981" }
 ];
 
-const DEFAULT_CARDS = [
-  {
-    id: "card-1",
-    title: "Design System Refactor",
-    description: "Update typography scales, button variants, and color tokens for modern look.",
-    columnId: "todo",
-    priority: "high",
-    dueDate: new Date().toISOString().split('T')[0], // Today
-    order: 0
-  },
-  {
-    id: "card-2",
-    title: "Implement drag-and-drop",
-    description: "Write custom Vanilla HTML5 drag events with visual markers and sorting index calculations.",
-    columnId: "in-progress",
-    priority: "medium",
-    dueDate: new Date(Date.now() + 86400000).toISOString().split('T')[0], // Tomorrow
-    order: 0
-  },
-  {
-    id: "card-3",
-    title: "Verify persistence layer",
-    description: "Ensure state changes are written to localStorage and successfully loaded on refreshes.",
-    columnId: "review",
-    priority: "low",
-    dueDate: "",
-    order: 0
-  },
-  {
-    id: "card-4",
-    title: "Project Initialization",
-    description: "Establish repository, configure styles, and build HTML templates.",
-    columnId: "done",
-    priority: "low",
-    dueDate: new Date(Date.now() - 172800000).toISOString().split('T')[0], // 2 days ago (overdue, but in Done column)
-    order: 0
-  }
-];
+const DEFAULT_CARDS = [];
 
 let state = {
   columns: [],
@@ -723,7 +686,28 @@ if (btnThemeToggle) {
   btnThemeToggle.addEventListener("click", toggleTheme);
 }
 
-// --- 11. INITIALIZATION ---
+// --- 11. RESET BOARD ENGINE ---
+const btnResetBoard = document.getElementById("btn-reset-board");
+
+function resetBoard() {
+  if (confirm("Are you sure you want to reset the board? This will delete all cards and restore standard columns.")) {
+    state.cards = [];
+    state.columns = [
+      { id: "todo", title: "To Do", color: "#6366f1" },
+      { id: "in-progress", title: "In Progress", color: "#3b82f6" },
+      { id: "review", title: "In Review", color: "#eab308" },
+      { id: "done", title: "Done", color: "#10b981" }
+    ];
+    saveState();
+    renderBoard();
+  }
+}
+
+if (btnResetBoard) {
+  btnResetBoard.addEventListener("click", resetBoard);
+}
+
+// --- 12. INITIALIZATION ---
 initTheme();
 loadState();
 renderBoard();
