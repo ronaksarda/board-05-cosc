@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Board05 | Premium Kanban Planner</title>
+  <!-- Google Fonts: Space Grotesk & Grenze Gotisch -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Grenze+Gotisch:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-logo">
+        <div class="logo-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <line x1="9" y1="3" x2="9" y2="21" />
+            <line x1="15" y1="3" x2="15" y2="21" />
+          </svg>
+        </div>
+        <h1>Kanban Board05</h1>
+      </div>
+
+      <!-- Quick Board Stats -->
+      <div class="board-stats">
+        <div class="stat-item">
+          <span class="stat-label">Total Cards:</span>
+          <span class="stat-value" id="total-cards-count">0</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-label">Completed:</span>
+          <span class="stat-value text-success" id="completed-cards-count">0</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-label">Completion Rate:</span>
+          <span class="stat-value text-accent" id="completion-rate">0%</span>
+        </div>
+      </div>
+
+      <!-- Header Actions -->
+      <div class="header-actions" style="display: flex; gap: 12px;">
+        <button id="btn-theme-toggle" class="btn-icon-only" title="Toggle Theme (McLaren / Mercedes)">
+          <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        <button id="btn-add-column" class="btn btn-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Add Column
+        </button>
+      </div>
+    </header>
+
+    <!-- Toolbar / Search and Filters -->
+    <section class="board-toolbar">
+      <div class="search-wrapper">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input type="text" id="search-input" placeholder="Search cards by title or description..." autocomplete="off">
+      </div>
+
+      <div class="filters-wrapper">
+        <div class="filter-group">
+          <label for="sort-by">Sort By:</label>
+          <select id="sort-by" class="select-input">
+            <option value="custom">Custom (Drag & Drop)</option>
+            <option value="priority">Priority (High to Low)</option>
+            <option value="date">Due Date (Earliest First)</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-priority">Priority:</label>
+          <select id="filter-priority" class="select-input">
+            <option value="all">All Priorities</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-date">Due Date:</label>
+          <select id="filter-date" class="select-input">
+            <option value="all">Anytime</option>
+            <option value="overdue">Overdue</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+          </select>
+        </div>
+
+        <button id="btn-clear-filters" class="btn btn-icon-only hidden" title="Clear Filters">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Board Grid Container -->
+    <main class="board-canvas" id="board-canvas">
+      <!-- Columns are injected dynamically by script.js -->
+    </main>
+  </div>
+
+  <!-- Dialog / Modal: Card Form -->
+  <div class="modal-overlay" id="modal-card" role="dialog" aria-modal="true">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="modal-card-title">Create New Card</h3>
+        <button class="btn-close-modal" id="btn-close-card-modal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <form id="form-card" class="modal-form">
+        <input type="hidden" id="card-id">
+        <input type="hidden" id="card-column-id">
+
+        <div class="form-group">
+          <label for="card-title-input" class="required-label">Title</label>
+          <input type="text" id="card-title-input" placeholder="What needs to be done?" required autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="card-desc-input">Description</label>
+          <textarea id="card-desc-input" rows="4" placeholder="Add more detailed info..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="card-priority-input">Priority</label>
+            <select id="card-priority-input" class="select-input">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="card-date-input">Due Date</label>
+            <input type="date" id="card-date-input" class="date-input">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-text" id="btn-cancel-card">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-card">Save Card</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dialog / Modal: Column Form -->
+  <div class="modal-overlay" id="modal-column" role="dialog" aria-modal="true">
+    <div class="modal-container modal-small">
+      <div class="modal-header">
+        <h3 id="modal-column-title">Add New Column</h3>
+        <button class="btn-close-modal" id="btn-close-column-modal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <form id="form-column" class="modal-form">
+        <input type="hidden" id="column-id">
+
+        <div class="form-group">
+          <label for="column-title-input" class="required-label">Column Name</label>
+          <input type="text" id="column-title-input" placeholder="e.g. Backlog, Testing" required autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label>Theme Color</label>
+          <div class="color-picker-grid">
+            <label class="color-radio">
+              <input type="radio" name="column-color" value="#6366f1" checked>
+              <span class="color-preview" style="background-color: #6366f1;"></span>
+            </label>
+            <label class="color-radio">
+              <input type="radio" name="column-color" value="#3b82f6">
+              <span class="color-preview" style="background-color: #3b82f6;"></span>
+            </label>
+            <label class="color-radio">
+              <input type="radio" name="column-color" value="#06b6d4">
+              <span class="color-preview" style="background-color: #06b6d4;"></span>
+            </label>
+            <label class="color-radio">
+              <input type="radio" name="column-color" value="#10b981">
+              <span class="color-preview" style="background-color: #10b981;"></span>
+            </label>
+            <label class="color-radio">
+              <input type="radio" name="column-color" value="#eab308">
+              <span class="color-preview" style="background-color: #eab308;"></span>
+            </label>
+            <label class="color-radio">
+              <input type="radio" name="column-color" value="#f97316">
+              <span class="color-preview" style="background-color: #f97316;"></span>
+            </label>
+            <label class="color-radio">
+              <input type="radio" name="column-color" value="#ef4444">
+              <span class="color-preview" style="background-color: #ef4444;"></span>
+            </label>
+            <label class="color-radio">
+              <input type="radio" name="column-color" value="#ec4899">
+              <span class="color-preview" style="background-color: #ec4899;"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-text" id="btn-cancel-column">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-column">Save Column</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
